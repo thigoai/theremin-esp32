@@ -1,211 +1,211 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Theremin - ESP32</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theremin - ESP32</title>
 
-    <style>
-        :root {
-        --mk-bg: #221F22;
-        --mk-panel: #2D2A2E;
-        --mk-pink: #FF6188;
-        --mk-green: #A9DC76;
-        --mk-yellow: #FFD866;
-        --mk-cyan: #78DCE8;
-        --mk-text: #FCFCFA;
-        --mk-muted: #939293;
-        --mk-shadow: #110F11;
-        }
+  <style>
+    :root {
+      --mk-bg: #221F22;
+      --mk-panel: #2D2A2E;
+      --mk-pink: #FF6188;
+      --mk-green: #A9DC76;
+      --mk-yellow: #FFD866;
+      --mk-cyan: #78DCE8;
+      --mk-text: #FCFCFA;
+      --mk-muted: #939293;
+      --mk-shadow: #110F11;
+    }
 
-        @font-face {
-        font-family: 'PressStart';
-        src: url('/PressStart2P.ttf') format('truetype');
-        }
+    @font-face {
+      font-family: 'PressStart';
+      src: url('/PressStart2P.ttf') format('truetype');
+    }
 
-        * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'PressStart', monospace;
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'PressStart', monospace;
+    }
 
-        body {
-        background-color: var(--mk-bg);
-        color: var(--mk-text);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        padding: 2rem 1rem;
-        text-transform: uppercase;
-        }
+    body {
+      background-color: var(--mk-bg);
+      color: var(--mk-text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      text-transform: uppercase;
+    }
 
-        header {
-        text-align: center;
-        margin-bottom: 1.5rem;
-        }
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
 
-        h1 {
-        color: var(--mk-pink);
-        font-size: 1.4rem;
-        text-shadow: 4px 4px 0px var(--mk-shadow);
-        line-height: 2;
-        }
+    h1 {
+      color: var(--mk-pink);
+      font-size: 1.4rem;
+      text-shadow: 4px 4px 0px var(--mk-shadow);
+      line-height: 2;
+    }
 
-        .container {
-        background-color: var(--mk-panel);
-        border: 4px solid var(--mk-text);
-        width: 100%;
-        max-width: 520px;
-        box-shadow: 8px 8px 0px var(--mk-shadow);
-        }
+    .container {
+      background-color: var(--mk-panel);
+      border: 4px solid var(--mk-text);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 8px 8px 0px var(--mk-shadow);
+    }
 
-        .screen {
-        background-color: var(--mk-shadow);
-        border-bottom: 4px solid var(--mk-muted);
-        padding: 12px;
-        }
+    .screen {
+      background-color: var(--mk-shadow);
+      border-bottom: 4px solid var(--mk-muted);
+      padding: 12px;
+    }
 
-        .screen-topbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 8px;
-        }
+    .screen-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
 
-        .status-badge {
-        font-size: 0.55rem;
-        color: var(--mk-yellow);
-        animation: blink 1s step-end infinite;
-        }
+    .status-badge {
+      font-size: 0.55rem;
+      color: var(--mk-yellow);
+      animation: blink 1s step-end infinite;
+    }
 
-        .sensor-label {
-        font-size: 0.5rem;
-        color: var(--mk-muted);
-        }
+    .sensor-label {
+      font-size: 0.5rem;
+      color: var(--mk-muted);
+    }
 
-        @keyframes blink {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0; }
-        }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
 
-        #oscilloscope {
-        display: block;
-        width: 100%;
-        height: 80px;
-        image-rendering: pixelated;
-        border-top: 2px solid #2a2a2a;
-        border-bottom: 2px solid #2a2a2a;
-        margin-bottom: 10px;
-        }
+    #oscilloscope {
+      display: block;
+      width: 100%;
+      height: 80px;
+      image-rendering: pixelated;
+      border-top: 2px solid #2a2a2a;
+      border-bottom: 2px solid #2a2a2a;
+      margin-bottom: 10px;
+    }
 
-        .info-row {
-        display: flex;
-        gap: 8px;
-        }
+    .info-row {
+      display: flex;
+      gap: 8px;
+    }
 
-        .info-box {
-        flex: 1;
-        background: #1a181a;
-        border: 2px solid var(--mk-muted);
-        padding: 10px 6px;
-        text-align: center;
-        }
+    .info-box {
+      flex: 1;
+      background: #1a181a;
+      border: 2px solid var(--mk-muted);
+      padding: 10px 6px;
+      text-align: center;
+    }
 
-        .info-label {
-        display: block;
-        font-size: 0.45rem;
-        color: var(--mk-muted);
-        margin-bottom: 8px;
-        }
+    .info-label {
+      display: block;
+      font-size: 0.45rem;
+      color: var(--mk-muted);
+      margin-bottom: 8px;
+    }
 
-        .info-value {
-        font-size: 0.75rem;
-        color: var(--mk-green);
-        }
+    .info-value {
+      font-size: 0.75rem;
+      color: var(--mk-green);
+    }
 
-        .info-value.cyan { color: var(--mk-cyan); }
+    .info-value.cyan { color: var(--mk-cyan); }
 
-        .range-section {
-        padding: 12px;
-        border-bottom: 4px solid var(--mk-muted);
-        background: var(--mk-panel);
-        }
+    .range-section {
+      padding: 12px;
+      border-bottom: 4px solid var(--mk-muted);
+      background: var(--mk-panel);
+    }
 
-        .range-labels {
-        display: flex;
-        justify-content: space-between;
-        font-size: 0.45rem;
-        color: var(--mk-muted);
-        margin-bottom: 6px;
-        }
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.45rem;
+      color: var(--mk-muted);
+      margin-bottom: 6px;
+    }
 
-        .range-track {
-        height: 14px;
-        background: var(--mk-shadow);
-        border: 2px solid var(--mk-muted);
-        position: relative;
-        overflow: hidden;
-        }
+    .range-track {
+      height: 14px;
+      background: var(--mk-shadow);
+      border: 2px solid var(--mk-muted);
+      position: relative;
+      overflow: hidden;
+    }
 
-        .range-fill {
-        height: 100%;
-        width: 0%;
-        background: repeating-linear-gradient(
-            90deg,
-            var(--mk-green) 0px,
-            var(--mk-green) 4px,
-            transparent 4px,
-            transparent 8px
-        );
-        transition: width 0.1s;
-        }
+    .range-fill {
+      height: 100%;
+      width: 0%;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--mk-green) 0px,
+        var(--mk-green) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+      transition: width 0.1s;
+    }
 
-        .range-fill.out {
-        background: repeating-linear-gradient(
-            90deg,
-            var(--mk-pink) 0px,
-            var(--mk-pink) 4px,
-            transparent 4px,
-            transparent 8px
-        );
-        }
+    .range-fill.out {
+      background: repeating-linear-gradient(
+        90deg,
+        var(--mk-pink) 0px,
+        var(--mk-pink) 4px,
+        transparent 4px,
+        transparent 8px
+      );
+    }
 
-        .range-cursor {
-        position: absolute;
-        top: 0;
-        width: 4px;
-        height: 100%;
-        background: var(--mk-text);
-        left: 0%;
-        transition: left 0.1s;
-        }
+    .range-cursor {
+      position: absolute;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--mk-text);
+      left: 0%;
+      transition: left 0.1s;
+    }
 
-        .btn-play {
-        display: block;
-        width: 100%;
-        padding: 1.2rem;
-        font-size: 0.75rem;
-        cursor: pointer;
-        background-color: var(--mk-pink);
-        color: var(--mk-text);
-        border: none;
-        border-top: 4px solid var(--mk-text);
-        outline: none;
-        transition: all 0.1s;
-        }
+    .btn-play {
+      display: block;
+      width: 100%;
+      padding: 1.2rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background-color: var(--mk-pink);
+      color: var(--mk-text);
+      border: none;
+      border-top: 4px solid var(--mk-text);
+      outline: none;
+      transition: all 0.1s;
+    }
 
-        .btn-play:active {
-        background-color: #cc4d70;
-        }
+    .btn-play:active {
+      background-color: #cc4d70;
+    }
 
-        .btn-play.playing {
-        background-color: var(--mk-muted);
-        color: var(--mk-shadow);
-        }
-    </style>
+    .btn-play.playing {
+      background-color: var(--mk-muted);
+      color: var(--mk-shadow);
+    }
+  </style>
 </head>
 <body>
 
@@ -253,10 +253,10 @@
 
   <script>
     let audioCtx, oscillator, gainNode;
-    let playing = false; demoMode = false;
+    let playing = false, demoMode = false;
     let currentFreq = 440;
 
-    const btn = document.getElementById('btn');
+    const btn         = document.getElementById('btn');
     const distEl      = document.getElementById('dist');
     const freqEl      = document.getElementById('freq-display');
     const statusEl    = document.getElementById('connection-status');
@@ -264,7 +264,7 @@
     const rangeCursor = document.getElementById('range-cursor');
 
     btn.addEventListener('click', async function () {
-      if (!tocando) {
+      if (!playing) {
         audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
         oscillator = audioCtx.createOscillator();
         gainNode   = audioCtx.createGain();
@@ -275,16 +275,18 @@
         gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
         oscillator.start();
 
-        tocando = true;
+        playing = true;
         this.innerText = '\u25A0 STOP';
         this.classList.add('playing');
-        buscarDados();
+        getData();
       } else {
-        gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
-        setTimeout(() => {
-          if (oscillator) oscillator.stop();
-          if (audioCtx)   audioCtx.close();
-        }, 200);
+        if (gainNode && audioCtx) {
+          gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+          setTimeout(() => {
+            if (oscillator) oscillator.stop();
+            if (audioCtx)   audioCtx.close();
+          }, 200);
+        }
 
         playing = false;
         this.innerText = '\u25BA PLAY';
@@ -315,8 +317,8 @@
       return -1;
     }
 
-    async function getDate() {
-      if (!tocando) return;
+    async function getData() {
+      if (!playing) return;
 
       const dist = await getDistance();
 
@@ -330,13 +332,13 @@
           rangeFill.style.width = (pct * 100).toFixed(1) + '%';
           rangeFill.classList.remove('out');
 
-          const freqRaw        = Math.max(100, 1200 - dist * 2);
-          const freqQuantizada = Math.floor(freqRaw / 20) * 20;
-          freqAtual = freqQuantizada;
+          const freqRaw   = Math.max(100, 1200 - dist * 2);
+          const freqQuant = Math.floor(freqRaw / 20) * 20;
+          currentFreq = freqQuant;
 
           gainNode.gain.setTargetAtTime(0.5, audioCtx.currentTime, 0.01);
-          oscillator.frequency.setTargetAtTime(freqQuantizada, audioCtx.currentTime, 0.05);
-          freqEl.innerText = freqQuantizada + ' Hz';
+          oscillator.frequency.setTargetAtTime(freqQuant, audioCtx.currentTime, 0.05);
+          freqEl.innerText = freqQuant + ' Hz';
         } else {
           gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.01);
           freqEl.innerText = 'OUT RNG';
@@ -345,9 +347,10 @@
         }
       }
 
-      setTimeout(getDate, 50);
+      setTimeout(getData, 50);
     }
 
+    // === OSCILLOSCOPE ===
     const canvas = document.getElementById('oscilloscope');
     const ctx    = canvas.getContext('2d');
     let phase    = 0;
@@ -399,7 +402,6 @@
     }
 
     drawOscilloscope();
-
   </script>
 
 </body>
