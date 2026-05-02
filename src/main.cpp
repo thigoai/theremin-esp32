@@ -10,13 +10,13 @@ WebServer server(80);
 VL53L0X sensor;
 int currentDistance = 0;
 
-void sentWebPage(){
+void sendWebPage(){
   File file = LittleFS.open ("/index.html", "r");
   server.streamFile(file, "text/html");
   file.close();
 }
 
-void sentDistance(){
+void sendDistance(){
   server.send(200, "text/plain", String(currentDistance));
 }
 
@@ -45,8 +45,8 @@ void setup(){
   Serial.print("Connect to the 'Theremin-ESP' Wi-Fi network and access the IP address: ");
   Serial.println(WiFi.softAPIP());
 
-  server.on("/", sentWebPage);
-  server.on("/distance", sentDistance);
+  server.on("/", sendWebPage);
+  server.on("/distance", sendDistance);
   server.on("/PressStart2P.ttf", []() {
     File file = LittleFS.open("/PressStart2P.ttf", "r");
     if (!file) {
@@ -56,7 +56,7 @@ void setup(){
     server.streamFile(file, "font/truetype");
     file.close();
   });
-  
+
   server.begin();
 }
 
