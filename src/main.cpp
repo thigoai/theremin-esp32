@@ -24,6 +24,13 @@ void setup(){
   Serial.begin(115200);
   Wire.begin(4, 5);
 
+  if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS error");
+    return;
+  } else {
+    Serial.println("LittleFS OK!");
+  }
+
   sensor.setTimeout(500);
   if(!sensor.init()){
     Serial.println("Fail to conect VL53LOX");
