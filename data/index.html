@@ -1,9 +1,211 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Theremin - ESP32</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Theremin - ESP32</title>
+
+    <style>
+        :root {
+        --mk-bg: #221F22;
+        --mk-panel: #2D2A2E;
+        --mk-pink: #FF6188;
+        --mk-green: #A9DC76;
+        --mk-yellow: #FFD866;
+        --mk-cyan: #78DCE8;
+        --mk-text: #FCFCFA;
+        --mk-muted: #939293;
+        --mk-shadow: #110F11;
+        }
+
+        @font-face {
+        font-family: 'PressStart';
+        src: url('/PressStart2P.ttf') format('truetype');
+        }
+
+        * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'PressStart', monospace;
+        }
+
+        body {
+        background-color: var(--mk-bg);
+        color: var(--mk-text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        text-transform: uppercase;
+        }
+
+        header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        }
+
+        h1 {
+        color: var(--mk-pink);
+        font-size: 1.4rem;
+        text-shadow: 4px 4px 0px var(--mk-shadow);
+        line-height: 2;
+        }
+
+        .container {
+        background-color: var(--mk-panel);
+        border: 4px solid var(--mk-text);
+        width: 100%;
+        max-width: 520px;
+        box-shadow: 8px 8px 0px var(--mk-shadow);
+        }
+
+        .screen {
+        background-color: var(--mk-shadow);
+        border-bottom: 4px solid var(--mk-muted);
+        padding: 12px;
+        }
+
+        .screen-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        }
+
+        .status-badge {
+        font-size: 0.55rem;
+        color: var(--mk-yellow);
+        animation: blink 1s step-end infinite;
+        }
+
+        .sensor-label {
+        font-size: 0.5rem;
+        color: var(--mk-muted);
+        }
+
+        @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+        }
+
+        #oscilloscope {
+        display: block;
+        width: 100%;
+        height: 80px;
+        image-rendering: pixelated;
+        border-top: 2px solid #2a2a2a;
+        border-bottom: 2px solid #2a2a2a;
+        margin-bottom: 10px;
+        }
+
+        .info-row {
+        display: flex;
+        gap: 8px;
+        }
+
+        .info-box {
+        flex: 1;
+        background: #1a181a;
+        border: 2px solid var(--mk-muted);
+        padding: 10px 6px;
+        text-align: center;
+        }
+
+        .info-label {
+        display: block;
+        font-size: 0.45rem;
+        color: var(--mk-muted);
+        margin-bottom: 8px;
+        }
+
+        .info-value {
+        font-size: 0.75rem;
+        color: var(--mk-green);
+        }
+
+        .info-value.cyan { color: var(--mk-cyan); }
+
+        .range-section {
+        padding: 12px;
+        border-bottom: 4px solid var(--mk-muted);
+        background: var(--mk-panel);
+        }
+
+        .range-labels {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.45rem;
+        color: var(--mk-muted);
+        margin-bottom: 6px;
+        }
+
+        .range-track {
+        height: 14px;
+        background: var(--mk-shadow);
+        border: 2px solid var(--mk-muted);
+        position: relative;
+        overflow: hidden;
+        }
+
+        .range-fill {
+        height: 100%;
+        width: 0%;
+        background: repeating-linear-gradient(
+            90deg,
+            var(--mk-green) 0px,
+            var(--mk-green) 4px,
+            transparent 4px,
+            transparent 8px
+        );
+        transition: width 0.1s;
+        }
+
+        .range-fill.out {
+        background: repeating-linear-gradient(
+            90deg,
+            var(--mk-pink) 0px,
+            var(--mk-pink) 4px,
+            transparent 4px,
+            transparent 8px
+        );
+        }
+
+        .range-cursor {
+        position: absolute;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--mk-text);
+        left: 0%;
+        transition: left 0.1s;
+        }
+
+        .btn-play {
+        display: block;
+        width: 100%;
+        padding: 1.2rem;
+        font-size: 0.75rem;
+        cursor: pointer;
+        background-color: var(--mk-pink);
+        color: var(--mk-text);
+        border: none;
+        border-top: 4px solid var(--mk-text);
+        outline: none;
+        transition: all 0.1s;
+        }
+
+        .btn-play:active {
+        background-color: #cc4d70;
+        }
+
+        .btn-play.playing {
+        background-color: var(--mk-muted);
+        color: var(--mk-shadow);
+        }
+    </style>
 </head>
 <body>
 
@@ -26,8 +228,26 @@
           <span class="info-label">Distance</span>
           <span class="info-value" id="dist">--- mm</span>
         </div>
+        <div class="info-box">
+          <span class="info-label">Frequency</span>
+          <span class="info-value cyan" id="freq-display">--- Hz</span>
+        </div>
       </div>
     </div>
+
+    <div class="range-section">
+      <div class="range-labels">
+        <span>30 mm</span>
+        <span>RANGE</span>
+        <span>500 mm</span>
+      </div>
+      <div class="range-track">
+        <div class="range-fill" id="range-fill"></div>
+        <div class="range-cursor" id="range-cursor"></div>
+      </div>
+    </div>
+
+    <button class="btn-play" id="btn">&#9654; PLAY</button>
 
   </div>
 
