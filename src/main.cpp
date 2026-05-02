@@ -3,11 +3,18 @@
 #include <VL53L0X.h>
 #include <WiFi.h>
 #include <WebServer.h>
+#include <LittleFS.h>
 
 WebServer server(80);
 
 VL53L0X sensor;
 int currentDistance = 0;
+
+void sentWebPage(){
+  File file = LittleFS.open ("/index.html", "r");
+  server.streamFile(file, "text/html");
+  file.close();
+}
 
 void sentDistance(){
   server.send(200, "text/plain", String(currentDistance));
@@ -31,6 +38,7 @@ void setup(){
   Serial.print("Connect to the 'Theremin-ESP' Wi-Fi network and access the IP address: ");
   Serial.println(WiFi.softAPIP());
 
+  server.on("/", sentWebPage);
   server.on("/distance", sentDistance);
 
   server.begin();

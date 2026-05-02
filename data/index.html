@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theremin - ESP32</title>
+</head>
+<body>
+
+  <header>
+    <h1>THEREMIN<br>ESP32</h1>
+  </header>
+
+  <div class="container">
+
+    <div class="screen">
+      <div class="screen-topbar">
+        <span id="connection-status" class="status-badge">● ESP READY</span>
+        <span class="sensor-label">VL53L0X</span>
+      </div>
+
+      <canvas id="oscilloscope" width="480" height="80"></canvas>
+
+      <div class="info-row">
+        <div class="info-box">
+          <span class="info-label">Distance</span>
+          <span class="info-value" id="dist">--- mm</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+  </script>
+
+</body>
+</html>
