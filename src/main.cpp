@@ -47,7 +47,16 @@ void setup(){
 
   server.on("/", sentWebPage);
   server.on("/distance", sentDistance);
-
+  server.on("/PressStart2P.ttf", []() {
+    File file = LittleFS.open("/PressStart2P.ttf", "r");
+    if (!file) {
+      server.send(404, "text/plain", "Fonte nao encontrada");
+      return;
+    }
+    server.streamFile(file, "font/truetype");
+    file.close();
+  });
+  
   server.begin();
 }
 
