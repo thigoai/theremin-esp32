@@ -50,7 +50,7 @@ void setup(){
   server.on("/PressStart2P.ttf", []() {
     File file = LittleFS.open("/PressStart2P.ttf", "r");
     if (!file) {
-      server.send(404, "text/plain", "Fonte nao encontrada");
+      server.send(404, "text/plain", "Font dont find");
       return;
     }
     server.streamFile(file, "font/truetype");
